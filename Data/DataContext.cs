@@ -14,7 +14,7 @@ namespace FilmAPI.Data
         public DbSet<Genre> Genres { get; set; }
         public DbSet<PersonGenre> PersonGenres { get; set; }
         public DbSet<Rating> Ratings { get; set; }
-
+        public DbSet<MovieGenre> MovieGenres { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlServer("Data Source=DESKTOP-2TAA998; Initial Catalog=MovieAPIDb;Integrated Security=true; TrustServerCertificate=true");
 

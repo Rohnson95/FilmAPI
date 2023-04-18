@@ -45,16 +45,40 @@ namespace FilmAPI
                 var movies = context.Movies;
                 var persons = context.Persons;
                 var ratings = context.Ratings;
+                var movieGenre = context.MovieGenres;
+                var genre = context.Genres;
                 var query = from pers in persons
                             join mov in movies on pers.PersonId equals mov.FkPersonId
                             join rat in ratings on mov.Id equals rat.FkMovieId
+
                             select new
                             {
                                 pers.FirstName,
                                 mov.Name,
                                 rat.Ratings
+
+
+
                             };
                 return await query.FirstOrDefaultAsync(x => x.Name == Name);
+            });
+            app.MapGet("api/moviegenre/{Name}", async (DataContext context, string Name) =>
+            {
+                var movies = context.Movies;
+                var movieGenre = context.MovieGenres;
+                var genre = context.Genres;
+                var query = from movs in movies
+                            join movgen in movieGenre on movs.Id equals movgen.FkMovieid
+                            join gen in genre on movgen.FkGenreId equals gen.GenreId
+
+                            select new
+                            {
+                                movgen.Movies.Name,
+                                movgen.Genres.Title
+                            };
+                var result = query.GroupBy(x => x.Name)
+                                .Select(x => new { Name = x.Key, Title = string.Join(", ", x.Select(y => y.Title)) }).FirstOrDefaultAsync(x => x.Name == Name);
+                return await result;//query.GroupBy(x => x.Title).ToListAsync();
             });
 
 
