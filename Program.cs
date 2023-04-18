@@ -1,5 +1,6 @@
 using FilmAPI.Data;
 using Microsoft.EntityFrameworkCore;
+
 namespace FilmAPI
 {
     public class Program
@@ -24,7 +25,7 @@ namespace FilmAPI
                 app.UseSwaggerUI();
             }
 
-            app.MapGet("/api/Movies/{Name}", async (DataContext context, string Name) =>
+            /*app.MapGet("/api/Movies/{Name}", async (DataContext context, string Name) =>
             {
                 var movies = context.Movies;
                 var moviePerson = movies.Join(context.Persons, movie => movie.FkPersonId,
@@ -33,9 +34,30 @@ namespace FilmAPI
                         movie.Name,
                         movie.Link,
                         per.FirstName
+
                     }).FirstOrDefaultAsync(x => x.Name == Name);
                 return await moviePerson;
             });
+            */
+
+            app.MapGet("/api/Movies/{Name}", async (DataContext context, string Name) =>
+            {
+                var movies = context.Movies;
+                var persons = context.Persons;
+                var ratings = context.Ratings;
+                var query = from pers in persons
+                            join mov in movies on pers.PersonId equals mov.FkPersonId
+                            join rat in ratings on mov.Id equals rat.FkMovieId
+                            select new
+                            {
+                                pers.FirstName,
+                                mov.Name,
+                                rat.Ratings
+                            };
+                return await query.FirstOrDefaultAsync(x => x.Name == Name);
+            });
+
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
