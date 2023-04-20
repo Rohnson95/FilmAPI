@@ -5,6 +5,7 @@ namespace FilmAPI.Models
     public class PersonGenre
     {
         [Key]
+        [Required]
         public int PersonGenreId { get; set; }
         public int FkPersonId { get; set; }
         public int FkGenreId { get; set; }

@@ -23,14 +23,15 @@ namespace FilmAPI
         [X] Hämta alla personer i systemet
         [X] Hämta alla genrer som är kopplade till en specifik person
         [X] Hämta alla filmer som är kopplade till en specifik person
-        [>] Lägga in och hämta "rating" på filmer kopplat till en person
-        [ ] Koppla en person till en ny genre
-        [ ] Lägga in nya länkar för en specifik person och en specifik genre
-        [ ] Få förslag på filmer i en viss genre från ett externt API, t.ex TMDB.Links to an external site.
+        [X] Lägga in och hämta "rating" på filmer kopplat till en person
+        [X] Koppla en person till en ny genre
+        [X] Lägga in nya länkar för en specifik person och en specifik genre
+        [X] Få förslag på filmer i en viss genre från ett externt API, t.ex TMDB.Links to an external site.
          */
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            var client = new HttpClient();
 
             // Add services to the container.
             builder.Services.AddAuthorization();
@@ -47,7 +48,22 @@ namespace FilmAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseHttpsRedirection();
+            app.UseAuthorization();
+            app.MapGet("/api/Discover/", async (DataContext context, string genreName) =>
+            {
+                var client = new HttpClient();
+                var gen = await context.Genres.SingleOrDefaultAsync(g => g.Title == genreName);
+                string apiKey = "9baeecd677d8c50be742a741f245bcac";
+                string apiUrl = $"https://api.themoviedb.org/3/discover/movie?api_key={apiKey}&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_keywords=action&with_watch_monetization_types=flatrate&with_genres={gen.GenreId}";
+                var response = await client.GetAsync(apiUrl);
+                response.EnsureSuccessStatusCode();
+                var content = await response.Content.ReadAsStringAsync();
 
+
+
+                return Results.Content(content, contentType: "application/json");
+            });
             app.MapGet("/api/Person/", async (DataContext context) =>
             {
                 var query = from persons in context.Persons
@@ -129,7 +145,7 @@ namespace FilmAPI
 
                 }
                 var perGen = context.PersonGenres;
-                perGen.Add(new Models.PersonGenre { FkPersonId = person.PersonId, FkGenreId = GenreId });
+                perGen.Add(new PersonGenre { FkPersonId = person.PersonId, FkGenreId = GenreId });
                 await context.SaveChangesAsync();
                 return Results.Created($"/api/Person/toGenre/", GenreId);
             });
@@ -137,14 +153,36 @@ namespace FilmAPI
             {
                 var mov = await context.Movies.SingleOrDefaultAsync(m => m.Name == Name);
                 var rat = context.Ratings;
-
                 rat.Add(new Rating { FkMovieId = mov.Id, FkPersonId = mov.FkPersonId, Ratings = rating });
                 await context.SaveChangesAsync();
                 return Results.Created($"/api/GiveRating/", rating);
             });
-
-            app.UseHttpsRedirection();
-            app.UseAuthorization();
+            app.MapPost("/api/AddMovieLink/", async (DataContext context, string name, string movieName, string link) =>
+            {
+                var person = await context.Persons.SingleOrDefaultAsync(p => p.FirstName == name);
+                if (person == null)
+                {
+                    return Results.NotFound();
+                }
+                var addM = context.Movies;
+                var addMg = context.MovieGenres;
+                addM.Add(new Movie { FkPersonId = person.PersonId, Name = movieName, Link = link });
+                await context.SaveChangesAsync();
+                return Results.Created($"/api/AddMovieLink/", movieName);
+            });
+            app.MapPost("/api/AddGenreToMovie/", async (DataContext context, string movieName, string genreName) =>
+            {
+                var movie = await context.Movies.SingleOrDefaultAsync(m => m.Name == movieName);
+                var movgen = context.MovieGenres;
+                var gen = await context.Genres.SingleOrDefaultAsync(g => g.Title == genreName);
+                if (movie == null)
+                {
+                    return Results.NotFound();
+                }
+                movgen.Add(new MovieGenre { FkGenreId = gen.GenreId, FkMovieid = movie.Id });
+                await context.SaveChangesAsync();
+                return Results.Created($"/api/AddGenreToMovie/", movieName);
+            });
             app.MapGet("/api/PersonGenre/{Name}", async (DataContext context, string Name) =>
             {
                 var pGen = context.PersonGenres;

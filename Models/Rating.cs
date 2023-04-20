@@ -4,6 +4,7 @@ namespace FilmAPI.Models
     public class Rating
     {
         [Key]
+        [Required]
         public int RatingId { get; set; }
         public int Ratings { get; set; }
         public int FkPersonId { get; set; }

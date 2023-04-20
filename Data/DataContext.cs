@@ -73,6 +73,7 @@ namespace FilmAPI.Data
             });
             modelBuilder.Entity<PersonGenre>()
                 .HasIndex(persg => new { persg.FkPersonId, persg.FkGenreId }).IsUnique();
+            modelBuilder.Entity<Movie>().HasIndex(pm => new { pm.Link }).IsUnique();
         }
     }
 
