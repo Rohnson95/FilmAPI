@@ -38,6 +38,122 @@ namespace FilmAPI.Migrations
                     b.HasKey("GenreId");
 
                     b.ToTable("Genres");
+
+                    b.HasData(
+                        new
+                        {
+                            GenreId = 28,
+                            Description = "Explosions",
+                            Title = "Action"
+                        },
+                        new
+                        {
+                            GenreId = 12,
+                            Description = "Adventuretime",
+                            Title = "Adventure"
+                        },
+                        new
+                        {
+                            GenreId = 16,
+                            Description = "Graphic Beauty!",
+                            Title = "Animation"
+                        },
+                        new
+                        {
+                            GenreId = 35,
+                            Description = "Will make you laugh",
+                            Title = "Comedy"
+                        },
+                        new
+                        {
+                            GenreId = 80,
+                            Description = "Watch out!",
+                            Title = "Crime"
+                        },
+                        new
+                        {
+                            GenreId = 99,
+                            Description = "about the world",
+                            Title = "Documentary"
+                        },
+                        new
+                        {
+                            GenreId = 18,
+                            Description = "dramatic",
+                            Title = "Drama"
+                        },
+                        new
+                        {
+                            GenreId = 10751,
+                            Description = "fun for everyone",
+                            Title = "Family"
+                        },
+                        new
+                        {
+                            GenreId = 14,
+                            Description = "Fantastic",
+                            Title = "Fantasy"
+                        },
+                        new
+                        {
+                            GenreId = 36,
+                            Description = "Historical epicness",
+                            Title = "History"
+                        },
+                        new
+                        {
+                            GenreId = 27,
+                            Description = "Horrific",
+                            Title = "Horror"
+                        },
+                        new
+                        {
+                            GenreId = 10402,
+                            Description = "Musical magic",
+                            Title = "Music"
+                        },
+                        new
+                        {
+                            GenreId = 9648,
+                            Description = "Mysterical",
+                            Title = "Mystery"
+                        },
+                        new
+                        {
+                            GenreId = 10749,
+                            Description = "Lovely",
+                            Title = "Romance"
+                        },
+                        new
+                        {
+                            GenreId = 878,
+                            Description = "Lasers",
+                            Title = "Science Fiction"
+                        },
+                        new
+                        {
+                            GenreId = 10770,
+                            Description = "wow tv",
+                            Title = "TV Movie"
+                        },
+                        new
+                        {
+                            GenreId = 53,
+                            Description = "Thrilling",
+                            Title = "Thriller"
+                        },
+                        new
+                        {
+                            GenreId = 10752,
+                            Description = "War",
+                            Title = "War"
+                        },
+                        new
+                        {
+                            GenreId = 37,
+                            Description = "Cowboys",
+                            Title = "Western"
+                        });
                 });
 
             modelBuilder.Entity("FilmAPI.Models.Movie", b =>
