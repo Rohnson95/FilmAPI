@@ -7,19 +7,11 @@ namespace FilmAPI
     public class Program
     {
         /*
-         ⚙️ Applikationen
-
-        Det första du ska skapa är en väldigt grundläggande applikation med en databas som klarar följande.
-
         [X] Det ska gå att lagra personer med grundläggande information om dem som namn och epostadresser.
         [X] Systemet ska kunna lagra ett obegränsat antal genres som de gillar. Varje genre ska ha en titel och en kort beskrivning.
         [X] Varje person ska kunna vara intresserad av valfritt antal genres
         [X] Det ska gå att lagra ett obegränsat antal länkar (till filmer) till varje genre för varje person. Om en person lägger in en länk så är den alltså kopplad både till den personen och till den genren.
         [X] Skapa applikationen med hänsyn till Repository pattern. 
-        🗣 Skapa ett REST-API
-
-        Det andra steget du ska göra är att skapa ett REST-API som tillåter externa tjänster att utföra följande anrop till ditt API samt genomför dessa förändringar i din applikation.
-
         [X] Hämta alla personer i systemet
         [X] Hämta alla genrer som är kopplade till en specifik person
         [X] Hämta alla filmer som är kopplade till en specifik person
@@ -54,7 +46,7 @@ namespace FilmAPI
             {
                 var client = new HttpClient();
                 var gen = await context.Genres.SingleOrDefaultAsync(g => g.Title == genreName);
-                string apiKey = "9baeecd677d8c50be742a741f245bcac";
+                string apiKey = "";
                 string apiUrl = $"https://api.themoviedb.org/3/discover/movie?api_key={apiKey}&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_keywords=action&with_watch_monetization_types=flatrate&with_genres={gen.GenreId}";
                 var response = await client.GetAsync(apiUrl);
                 response.EnsureSuccessStatusCode();
