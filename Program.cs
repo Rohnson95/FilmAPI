@@ -42,6 +42,7 @@ namespace FilmAPI
             }
             app.UseHttpsRedirection();
             app.UseAuthorization();
+            //gets information from an external api using an apikey and a link. The get also replaces a string with its corresponding id in the database
             app.MapGet("/api/Discover/", async (DataContext context, string genreName) =>
             {
                 var client = new HttpClient();
@@ -56,12 +57,14 @@ namespace FilmAPI
 
                 return Results.Content(content, contentType: "application/json");
             });
+            //gets information on every person that exists in the database
             app.MapGet("/api/Person/", async (DataContext context) =>
             {
                 var query = from persons in context.Persons
                             select new { persons.FirstName, persons.Email };
                 return await query.ToListAsync();
             });
+            //gets information on movies added by an individual
             app.MapGet("/api/GetMovieByPerson/", async (DataContext context, string Name) =>
             {
                 var query = from rat in context.Ratings
@@ -74,6 +77,7 @@ namespace FilmAPI
                 var result = query.GroupBy(x => x.FirstName).Select(x => new { Name = x.Key, Movie = x.Select(y => y.Name), Link = x.Select(z => z.Link).Distinct() }).Where(x => x.Name == Name).ToListAsync();
                 return await result;
             });
+            //Gets a list of movies based on the genre, with the person who added the link
             app.MapGet("/api/Genres/Movies/{Name}", async (DataContext context, string Name) =>
             {
                 var movies = context.Movies;
@@ -97,25 +101,22 @@ namespace FilmAPI
                             };
                 return await query.Where(x => x.Title == Name).ToListAsync();
             });
+            //gets a list of movies with the corresponding genre
             app.MapGet("/api/moviegenre/{Name}", async (DataContext context, string Name) =>
             {
                 var movieGenre = context.MovieGenres;
                 var query = from movgen in movieGenre
-                                //join movgen in movieGenre on movs.Id equals movgen.FkMovieid
-                                //join gen in genre on movgen.FkGenreId equals gen.GenreId
-
                             select new
                             {
                                 movgen.Movies.Name,
                                 movgen.Movies.Link,
                                 movgen.Genres.Title
-
-
                             };
                 var result = query.GroupBy(x => x.Name)
                                 .Select(x => new { Name = x.Key, Genre = string.Join(", ", x.Select(y => y.Title)), Link = string.Join(", ", x.Select(z => z.Link).Distinct()) }).Where(x => x.Name == Name).ToListAsync();
                 return await result;
             });
+            //gets a list of movies and what the indiviual rated the movies
             app.MapGet("/api/GetRatings/{Name}", async (DataContext context, string Name) =>
             {
                 var query = from movrat in context.Ratings
@@ -128,6 +129,7 @@ namespace FilmAPI
                 return await query.Where(x => x.FirstName == Name).ToListAsync();
 
             });
+            //Allows an existing user to add a genre they enjoy
             app.MapPost("/api/Person/toGenre/", async (DataContext context, string Name, int GenreId) =>
             {
                 var person = await context.Persons.SingleOrDefaultAsync(p => p.FirstName == Name);
@@ -141,6 +143,7 @@ namespace FilmAPI
                 await context.SaveChangesAsync();
                 return Results.Created($"/api/Person/toGenre/", GenreId);
             });
+            //allows a person to rate a movie based on the movies name
             app.MapPost("/api/GiveRating/", async (DataContext context, string Name, int rating) =>
             {
                 var mov = await context.Movies.SingleOrDefaultAsync(m => m.Name == Name);
@@ -149,6 +152,7 @@ namespace FilmAPI
                 await context.SaveChangesAsync();
                 return Results.Created($"/api/GiveRating/", rating);
             });
+            //allows a person to add a link to a specific movie
             app.MapPost("/api/AddMovieLink/", async (DataContext context, string name, string movieName, string link) =>
             {
                 var person = await context.Persons.SingleOrDefaultAsync(p => p.FirstName == name);
@@ -162,6 +166,7 @@ namespace FilmAPI
                 await context.SaveChangesAsync();
                 return Results.Created($"/api/AddMovieLink/", movieName);
             });
+            //Allows you to add genre(s) to a specific movie
             app.MapPost("/api/AddGenreToMovie/", async (DataContext context, string movieName, string genreName) =>
             {
                 var movie = await context.Movies.SingleOrDefaultAsync(m => m.Name == movieName);
@@ -175,6 +180,7 @@ namespace FilmAPI
                 await context.SaveChangesAsync();
                 return Results.Created($"/api/AddGenreToMovie/", movieName);
             });
+            //Gets genres liked by an individual
             app.MapGet("/api/PersonGenre/{Name}", async (DataContext context, string Name) =>
             {
                 var pGen = context.PersonGenres;
@@ -189,7 +195,7 @@ namespace FilmAPI
                 var query = from sb in searchBy select new { sb.Movies.Name, sb.Genres.Title };
                 var result = query.GroupBy(x => x.Title).Select(x => new { Name = x.Key, Genre = string.Join(", ", x.Select(y => y.Name)) }).Where(x => x.Genre == Name).ToListAsync();
                 return await result;
-            });
+            }); // <-- Doesnt work! FIX!!!!
             app.Run();
         }
     }
