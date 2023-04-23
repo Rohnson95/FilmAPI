@@ -102,7 +102,7 @@ namespace FilmAPI
                 return await query.Where(x => x.Title == Name).ToListAsync();
             });
             //gets a list of movies with the corresponding genre
-            app.MapGet("/api/moviegenre/{Name}", async (DataContext context, string Name) =>
+            app.MapGet("/api/moviegenre/{MovieName}", async (DataContext context, string Name) =>
             {
                 var movieGenre = context.MovieGenres;
                 var query = from movgen in movieGenre
@@ -189,13 +189,6 @@ namespace FilmAPI
                                   .Select(x => new { Name = x.Key, Genre = string.Join(", ", x.Select(y => y.Title)) }).Where(x => x.Name == Name).ToListAsync();
                 return await result;
             });
-            app.MapGet("/api/MovieByGenre/{Name}", async (DataContext context, string Name) =>
-            {
-                var searchBy = context.MovieGenres;
-                var query = from sb in searchBy select new { sb.Movies.Name, sb.Genres.Title };
-                var result = query.GroupBy(x => x.Title).Select(x => new { Name = x.Key, Genre = string.Join(", ", x.Select(y => y.Name)) }).Where(x => x.Genre == Name).ToListAsync();
-                return await result;
-            }); // <-- Doesnt work! FIX!!!!
             app.Run();
         }
     }
