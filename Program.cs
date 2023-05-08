@@ -32,8 +32,9 @@ namespace FilmAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddCors(options => options.AddDefaultPolicy(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
             var app = builder.Build();
-
+            app.UseCors();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
